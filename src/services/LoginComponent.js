@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import Button from '@material-ui/core/Button';
 
-import AuthService from "../services/auth.service";
+import AuthService from "./item.service";
 
 const required = value => {
   if (!value) {
@@ -19,7 +19,6 @@ export default class Login extends Component {
     this.handleLogin = this.handleLogin.bind(this);
     this.onChangeUsername = this.onChangeUsername.bind(this);
     this.onChangePassword = this.onChangePassword.bind(this);
-
     this.state = {
       username: "",
       password: "",
