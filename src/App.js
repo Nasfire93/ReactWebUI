@@ -41,10 +41,10 @@ function App() {
   const [data,setData] = useState([]);
   const [modalInsert,setModalInsert] = useState(false);
   const [newItemData,setnewItemData] = useState({
-  creationDate: moment().format('YYYY-MM-DD'),
-  description:"",
-  state:"",
-  price:""
+  "creationDate": moment().format('YYYY-MM-DD'),
+  "description":"",
+  "state":"",
+  "price":""
   })
 
   const handleChange=e=>{
@@ -53,7 +53,6 @@ function App() {
       ...prevState,
       [name]: value
     }));
-    console.log(newItemData)
   }
 
   const GetData = async() =>{
@@ -65,7 +64,7 @@ function App() {
 
   const postData = async() =>{
     await axios.post(baseUrl + "addItem",newItemData).then(response=>{
-      setData(data.concat(response.data));
+      //setData(data.concat(response.data));
       changeModalInsert();
     })
   }
