@@ -5,8 +5,9 @@ import{Modal,TextField,Button} from '@material-ui/core';
 import {makeStyles} from '@material-ui/core/styles';
 import moment from 'moment';
 import ItemsService from "../services/items.service.js";
+import AuthService from "../services/auth.service.js";
 const columns = [
-  //{ title: "Item", field: "itemsId" },
+  { title: "Item", field: "itemsId" },
   { title: "Description" ,field: "description" },
   { title: "State", field: "state" },
   { title: "Price", field: "price"},
@@ -37,7 +38,9 @@ const useStyles = makeStyles((theme) => ({
 const ItemsTable = () => {
 
   const styles = useStyles();
-  const baseUrl = "http://localhost:8080/";
+  
+  const itemsService = ItemsService;
+  const authService = AuthService;
 
   const [data,setData] = useState([]);
   const [modalInsert,setModalInsert] = useState(false);
@@ -45,7 +48,8 @@ const ItemsTable = () => {
   "creationDate": moment().format('YYYY-MM-DD'),
   "description":"",
   "state":"",
-  "price":""
+  "price":"", 
+  "creator": authService.getCurrentUser().username
   })
 
   const handleChange=e=>{
@@ -56,15 +60,21 @@ const ItemsTable = () => {
     }));
   }
 
-  const itemsService = ItemsService;
   const GetData = async() =>{
-    itemsService.findAll();
+    await itemsService.findAll().then(response => {
+      setData(data.concat(response.data));
+    })
   }
 
   const postData = async() =>{
-    await axios.post(baseUrl + "addItem",newItemData).then(response=>{
-      //setData(data.concat(response.data));
+    await  itemsService.addItem(newItemData).then(response => {
+      setData(data.concat(newItemData));
       changeModalInsert();
+    })
+  }
+  const deleteData = async(idItem) =>{
+    await itemsService.deleteItem(idItem).then(response => {
+    
     })
   }
 
@@ -107,12 +117,12 @@ return (
         {
         icon: 'edit',
         tooltip: 'Edit Item',
-        onClick: (event,rowData) => alert('Click ' + rowData.item)
+        onClick: (event,rowData) => deleteData(rowData)
         },
         {
           icon: 'delete',
           tooltip: 'Delete Item',
-          onClick: (event,rowData) => alert('Deleted ' + rowData.item)
+          onClick: (event,rowData) => console.log(rowData)
           }
       ]}
       options = {{

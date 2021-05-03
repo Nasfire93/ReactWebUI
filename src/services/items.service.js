@@ -1,7 +1,7 @@
 import axios from "axios";
 import authHeader from './auth-header.js';
 
-const API_URL = "http://localhost:8080/";
+const API_URL = "http://localhost:8080/items/";
 
 class ItemsService {
 
@@ -19,6 +19,11 @@ class ItemsService {
     addItem(newItemData) {
         return axios
         .post(API_URL + "addItem",newItemData,{ headers: authHeader() })
+    }
+
+    deleteItem(newItemData) {
+        return axios
+        .post(API_URL + "deleteItem",newItemData,{ headers: authHeader() })
     }
 }
 
