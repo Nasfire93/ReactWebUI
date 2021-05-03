@@ -4,7 +4,7 @@ import axios from 'axios';
 import{Modal,TextField,Button} from '@material-ui/core';
 import {makeStyles} from '@material-ui/core/styles';
 import moment from 'moment';
-
+import ItemsService from "../services/items.service.js";
 const columns = [
   //{ title: "Item", field: "itemsId" },
   { title: "Description" ,field: "description" },
@@ -34,7 +34,8 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-function App() {
+const ItemsTable = () => {
+
   const styles = useStyles();
   const baseUrl = "http://localhost:8080/";
 
@@ -55,11 +56,9 @@ function App() {
     }));
   }
 
+  const itemsService = ItemsService;
   const GetData = async() =>{
-    await axios.get(baseUrl + "findAll").then(response=>{
-      console.log(response.data);
-      setData(response.data);
-    })
+    itemsService.findAll();
   }
 
   const postData = async() =>{
@@ -134,4 +133,4 @@ return (
   );
 }
 
-export default App;
+export default ItemsTable;
