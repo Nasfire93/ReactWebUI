@@ -1,11 +1,16 @@
 import React, {useState , useEffect } from 'react';
 import MaterialTable from 'material-table'
-import axios from 'axios';
 import{Modal,TextField,Button} from '@material-ui/core';
 import {makeStyles} from '@material-ui/core/styles';
 import moment from 'moment';
 import ItemsService from "../services/items.service.js";
 import AuthService from "../services/auth.service.js";
+import VendorService from "../services/vendor.service.js";
+import { Grid } from '@material-ui/core'
+import { Autocomplete } from '@material-ui/lab';
+import { useHistory} from "react-router-dom";
+import DescriptionComponent from "../Components/DescriptionComponent.js";
+
 const columns = [
   { title: "Item", field: "itemsId" },
   { title: "Description" ,field: "description" },
@@ -18,7 +23,7 @@ const columns = [
 const useStyles = makeStyles((theme) => ({
   modal: {
     position: 'absolute',
-    width: 400,
+    width: '50%',
     backgroundColor: theme.palette.background.paper,
     border: '2px solid #000',
     boxShadow: theme.shadows[5],
@@ -36,10 +41,12 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const ItemsTable = () => {
+  const history = useHistory();
 
   const styles = useStyles();
   
   const itemsService = ItemsService;
+  const vendorService = VendorService;
   const authService = AuthService;
 
   const [data,setData] = useState([]);
@@ -49,8 +56,10 @@ const ItemsTable = () => {
   "description":"",
   "state":"",
   "price":"", 
-  "creator": authService.getCurrentUser().username
+  "creator": authService.getCurrentUser() ? authService.getCurrentUser().username : "noLog",
+  "vendor":""
   })
+  const [options, setOptions] = useState([]);
 
   const handleChange=e=>{
     const {name, value}=e.target;
@@ -60,6 +69,20 @@ const ItemsTable = () => {
     }));
   }
 
+  const handleChangeVendor=(event, value)=>{
+    setnewItemData(prevState=>({
+      ...prevState,
+      "vendor": value
+    }));
+    };
+
+    const handleChangeState=(event, value)=>{
+      setnewItemData(prevState=>({
+        ...prevState,
+        "state": value
+      }));
+      };
+
   const GetData = async() =>{
     await itemsService.findAll().then(response => {
       setData(data.concat(response.data));
@@ -68,17 +91,27 @@ const ItemsTable = () => {
 
   const postData = async() =>{
     await  itemsService.addItem(newItemData).then(response => {
-      setData(data.concat(newItemData));
+      setData(data.concat(response.data));
       changeModalInsert();
     })
   }
   const deleteData = async(idItem) =>{
     await itemsService.deleteItem(idItem).then(response => {
-    
+      setData(data.filter(i => i.itemsId !== response.data.itemsId));
     })
   }
 
-  const changeModalInsert =() =>{
+  const getVendors = async() =>{
+      await vendorService.findAll().then(response => {
+        setOptions(response.data);
+        })
+    }
+    const logout = () =>{
+      authService.logout();
+      history.push('/');
+    }
+
+  const changeModalInsert = () =>{
     setModalInsert(!modalInsert);
   }
 
@@ -91,10 +124,24 @@ const ItemsTable = () => {
       <h3>Add new Item</h3>
       <TextField className={styles.inputMaterial} label="Description" name="description" onChange={handleChange} />          
       <br />
-      <TextField className={styles.inputMaterial} label="State" name="state" onChange={handleChange} />
       <br />
+      <Autocomplete
+        onChange={handleChangeState}
+        options={["Active","Discontinued"]}
+        renderInput={(params) =>
+          <TextField {...params} label="State" name="state" variant="outlined" />}
+      />
       <TextField className={styles.inputMaterial} label="Price" name="price" onChange={handleChange} />
       <br />
+      <br />
+      <Autocomplete
+        onOpen ={getVendors}
+        onChange={handleChangeVendor}
+        options={options}
+        getOptionLabel={(option) => (option ? option.name : "")}
+        renderInput={(params) =>
+          <TextField {...params} label="Vendor" name="vendor" variant="outlined" />}
+      />
       <br />
       <div align="right">
         <Button onClick ={postData} color="primary" >Add</Button>
@@ -107,9 +154,20 @@ return (
     <div>
       <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons"/>
       <br />
-      <Button onClick={changeModalInsert}>Add new item</Button>
+      <Grid
+        container
+        direction="row"
+        justify="space-between"
+        alignItems="flex-start">
+        <Button onClick={changeModalInsert}>Add new item</Button>
+        <Button onClick={changeModalInsert}>Add user</Button>
+        <Button onClick={logout}>Log out </Button>
+      </Grid>
       <br /><br />
       <MaterialTable
+        detailPanel={rowData => {
+          return(<DescriptionComponent data={rowData}/>)
+         }}
       columns = {columns}
       data = {data}
       title = "Items"
@@ -117,12 +175,12 @@ return (
         {
         icon: 'edit',
         tooltip: 'Edit Item',
-        onClick: (event,rowData) => deleteData(rowData)
+        onClick: (event,rowData) => console.log(rowData)
         },
         {
           icon: 'delete',
           tooltip: 'Delete Item',
-          onClick: (event,rowData) => console.log(rowData)
+          onClick: (event,rowData) => deleteData(rowData)
           }
       ]}
       options = {{
