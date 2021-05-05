@@ -1,8 +1,10 @@
 import React, {useState , useEffect } from 'react';
 import {makeStyles} from '@material-ui/core/styles';
 import { Grid } from '@material-ui/core'
-import Paper from '@material-ui/core/Paper';
+import FormLabel from '@material-ui/core/FormLabel';
 import { DataGrid } from '@material-ui/data-grid';
+import{TextField,Button} from '@material-ui/core';
+import FormControl from '@material-ui/core/FormControl';
 
 
 const useStyles = makeStyles((theme) => ({
@@ -48,34 +50,33 @@ const useStyles = makeStyles((theme) => ({
         <Grid 
         container
         direction="row"
-        justify="center"
-        alignItems="stretch" >
-          <Grid item xs={6} sm={3} >
-            <Paper className={classes.paper}>ID</Paper>
-            <Paper className={classes.paper}>State</Paper>
-            <Paper className={classes.paper}>Creation Date</Paper>
-            <Paper className={classes.paper}>Vendor</Paper>
-          </Grid>
-          <Grid item xs={6} sm={3}>
-            <Paper className={classes.paper}>{data.itemsId}</Paper>
-            <Paper className={classes.paper}>{data.state}</Paper>
-            <Paper className={classes.paper}>{data.creationDate}</Paper>
-            <Paper className={classes.paper}>{data.vendor.name}</Paper>
-  
-          </Grid>
-          <Grid item xs={6} sm={3} >
-            <Paper className={classes.paper}>Description</Paper>
-            <Paper className={classes.paper}>Price</Paper>
-            <Paper className={classes.paper}>Creator</Paper>
-            <Paper className={classes.paper}>CountryVendor</Paper>
-          </Grid>
-          <Grid item xs={6} sm={3}>
-            <Paper className={classes.paper}>{data.description}</Paper>
-            <Paper className={classes.paper}>{data.price}</Paper>
-            <Paper className={classes.paper}>{data.creator}</Paper>
-            <Paper className={classes.paper}>{data.vendor.country}</Paper>
-          </Grid>
-          <Grid item xs={12} sm={12} ><Paper className={classes.paper}>Reduced Price List</Paper></Grid>
+        justify="flex-start"
+        alignItems="flex-start" >
+          <Grid item xs={12} sm={6} md={3}>
+          <FormControl component="fieldset">
+                <FormLabel>ID</FormLabel>
+                <TextField value={data.itemsId} ></TextField>
+                </FormControl>
+            </Grid>
+            <Grid item xs={12} sm={6} md={3} >
+            <FormControl component="fieldset">
+                <FormLabel >State</FormLabel>
+                <TextField >{data.state}</TextField>
+                </FormControl>
+            </Grid>
+            <Grid item xs={12} sm={6} md={3}>
+            <FormControl component="fieldset">
+                <FormLabel>Creation Date</FormLabel>
+                <TextField>{data.creationDate}</TextField>
+                </FormControl>
+            </Grid>
+            <Grid item xs={12} sm={6} md={3} >
+            <FormControl component="fieldset">
+                <FormLabel >Vendor</FormLabel>
+                <TextField >{data.vendor.name}</TextField>
+                </FormControl>
+            </Grid>
+          <Grid item xs={12} sm={12} ><FormLabel className={classes.paper}>Reduced Price List</FormLabel></Grid>
         </Grid>
         <div style={{ height: '220px', width: '100%' }}>
         { <DataGrid 
