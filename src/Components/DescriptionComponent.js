@@ -5,6 +5,8 @@ import Paper from '@material-ui/core/Paper';
 import VendorService from "../services/vendor.service.js";
 import { Autocomplete } from '@material-ui/lab';
 import{TextField} from '@material-ui/core';
+import MaterialTable from 'material-table'
+import { DataGrid } from '@material-ui/data-grid';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -23,11 +25,17 @@ const useStyles = makeStyles((theme) => ({
 
 const DescriptionComponent = ({data}) => {
   const classes = useStyles();
-  const vendorService = VendorService;
-
+  const columns = [
+    { title: "ID", field: "priceReductionId" ,flex: 3},
+    { title: "Creator", field: "creator", flex: 1},
+    { title: "Reduced Price" ,field: "reducedprice" , flex: 1},
+    { title: "Date Start", field: "datestart"  ,flex: 1},
+    { title: "Date End", field: "dateend", flex: 1}
+  ];
 
   const bodyInsert = (
     <div>
+      <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons"/>
       <Grid 
       container
       direction="row"
@@ -38,20 +46,13 @@ const DescriptionComponent = ({data}) => {
           <Paper className={classes.paper}>State</Paper>
           <Paper className={classes.paper}>Creation Date</Paper>
           <Paper className={classes.paper}>Vendor</Paper>
-          {/* <Paper className={classes.paper}>Price Reduction</Paper> */}
         </Grid>
         <Grid item xs={6} sm={3}>
           <Paper className={classes.paper}>{data.itemsId}</Paper>
           <Paper className={classes.paper}>{data.state}</Paper>
           <Paper className={classes.paper}>{data.creationDate}</Paper>
           <Paper className={classes.paper}>{data.vendor.name}</Paper>
-          {/* <Autocomplete
-          className={classes.auto}
-        options={data.priceReductions}
-        renderInput={(params) =>
-          <TextField {...params} label="Price reductions" name="vendor" variant="outlined" />
-          }
-      /> */}
+
         </Grid>
         <Grid item xs={6} sm={3} >
           <Paper className={classes.paper}>Description</Paper>
@@ -65,7 +66,15 @@ const DescriptionComponent = ({data}) => {
           <Paper className={classes.paper}>{data.creator}</Paper>
           <Paper className={classes.paper}>{data.vendor.country}</Paper>
         </Grid>
+        <Grid item xs={12} sm={12} ><Paper className={classes.paper}>Reduced Price List</Paper></Grid>
       </Grid>
+      <div style={{ height: '220px', width: '100%' }}>
+      <DataGrid 
+      getRowId={(row) => row.priceReductionId}
+       rows={data.priceReductions} 
+       columns={columns} 
+       pageSize={2} />
+      </div>
     </div>
   )
   return bodyInsert;

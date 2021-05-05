@@ -10,6 +10,7 @@ import { Grid } from '@material-ui/core'
 import { Autocomplete } from '@material-ui/lab';
 import { useHistory} from "react-router-dom";
 import DescriptionComponent from "../Components/DescriptionComponent.js";
+import EditItemComponent from "../Components/EditItemComponent.js";
 
 const columns = [
   { title: "Item", field: "itemsId" },
@@ -50,13 +51,15 @@ const ItemsTable = () => {
   const authService = AuthService;
 
   const [data,setData] = useState([]);
+  const [dataedit,setDataEdit] = useState([]);
   const [modalInsert,setModalInsert] = useState(false);
+  const [modalEdit,setModalEdit] = useState(false);
   const [newItemData,setnewItemData] = useState({
   "creationDate": moment().format('YYYY-MM-DD'),
   "description":"",
   "state":"",
   "price":"", 
-  "creator": authService.getCurrentUser() ? authService.getCurrentUser().username : "noLog",
+  "creator": authService.getCurrentUser().username,
   "vendor":""
   })
   const [options, setOptions] = useState([]);
@@ -113,6 +116,11 @@ const ItemsTable = () => {
 
   const changeModalInsert = () =>{
     setModalInsert(!modalInsert);
+  }
+
+  const changeModalEdit = (data) =>{
+    setDataEdit(data);
+    setModalEdit(!modalEdit);
   }
 
   useEffect(() =>{
@@ -173,9 +181,9 @@ return (
       title = "Items"
       actions = {[
         {
-        icon: 'edit',
-        tooltip: 'Edit Item',
-        onClick: (event,rowData) => console.log(rowData)
+          icon: 'edit',
+          tooltip: 'Edit Item',
+          onClick: (event,rowData) => changeModalEdit(rowData)
         },
         {
           icon: 'delete',
@@ -197,7 +205,16 @@ return (
       onClose={changeModalInsert}>
         {bodyInsert}
       </Modal>
+
+      <Modal 
+      open={modalEdit}
+      onClose={changeModalEdit}>
+        <EditItemComponent data={dataedit}/>
+      </Modal>
+
+
     </div>
+    
   );
 }
 
