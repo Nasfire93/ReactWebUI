@@ -1,7 +1,6 @@
 
 import Login from "./Components/LoginComponent.js";
 import ItemsTable from "./Components/ItemsTableComponents.js";
-import ReactDOM from "react-dom";
 import {
   BrowserRouter as Router,
   Switch,

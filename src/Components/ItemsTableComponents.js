@@ -11,6 +11,8 @@ import { Autocomplete } from '@material-ui/lab';
 import { useHistory} from "react-router-dom";
 import DescriptionComponent from "../Components/DescriptionComponent.js";
 import EditItemComponent from "../Components/EditItemComponent.js";
+import IconButton from '@material-ui/core/IconButton';
+import CloseIcon from '@material-ui/icons/Close';
 
 const columns = [
   { title: "Item", field: "itemsId" },
@@ -42,6 +44,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const ItemsTable = () => {
+  
   const history = useHistory();
 
   const styles = useStyles();
@@ -57,7 +60,7 @@ const ItemsTable = () => {
   const [newItemData,setnewItemData] = useState({
   "creationDate": moment().format('YYYY-MM-DD'),
   "description":"",
-  "state":"",
+  "state":"Active",
   "price":"", 
   "creator": authService.getCurrentUser().username,
   "vendor":""
@@ -95,6 +98,7 @@ const ItemsTable = () => {
   const postData = async() =>{
     await  itemsService.addItem(newItemData).then(response => {
       setData(data.concat(response.data));
+      console.log(data);
       changeModalInsert();
     })
   }
@@ -118,8 +122,7 @@ const ItemsTable = () => {
     setModalInsert(!modalInsert);
   }
 
-  const changeModalEdit = (data) =>{
-    setDataEdit(data);
+  const changeModalEdit = () =>{
     setModalEdit(!modalEdit);
   }
 
@@ -129,13 +132,24 @@ const ItemsTable = () => {
 
   const bodyInsert = (
     <div className={styles.modal}>
+              <Grid 
+          container
+          direction="row"
+          justify="flex-end"
+          alignItems="flex-start"
+        >
+            <IconButton aria-label="Close" onClick={changeModalInsert}>
+            <CloseIcon />
+            </IconButton>
+        </Grid>
       <h3>Add new Item</h3>
       <TextField className={styles.inputMaterial} label="Description" name="description" onChange={handleChange} />          
       <br />
       <br />
       <Autocomplete
         onChange={handleChangeState}
-        options={["Active","Discontinued"]}
+        options={["Active","Inactive"]}
+        defaultValue="Active"
         renderInput={(params) =>
           <TextField {...params} label="State" name="state" variant="outlined" />}
       />
@@ -153,7 +167,7 @@ const ItemsTable = () => {
       <br />
       <div align="right">
         <Button onClick ={postData} color="primary" >Add</Button>
-        <Button onClick={changeModalInsert}>Cancel</Button>
+        <Button onClick={changeModalInsert}>Close</Button>
       </div>
     </div>
   )
@@ -167,9 +181,8 @@ return (
         direction="row"
         justify="space-between"
         alignItems="flex-start">
-        <Button onClick={changeModalInsert}>Add new item</Button>
-        <Button onClick={changeModalInsert}>Add user</Button>
-        <Button onClick={logout}>Log out </Button>
+        <Button size="large" variant="outlined" onClick={changeModalInsert}>Add new item</Button>
+        <Button size="large" variant="outlined" onClick={logout}>Log out </Button>
       </Grid>
       <br /><br />
       <MaterialTable
@@ -183,7 +196,10 @@ return (
         {
           icon: 'edit',
           tooltip: 'Edit Item',
-          onClick: (event,rowData) => changeModalEdit(rowData)
+          onClick: (event,rowData) => {
+            changeModalEdit();
+            setDataEdit(rowData);
+          }
         },
         {
           icon: 'delete',
@@ -209,7 +225,7 @@ return (
       <Modal 
       open={modalEdit}
       onClose={changeModalEdit}>
-        <EditItemComponent data={dataedit}/>
+        <EditItemComponent data={dataedit} changeModalEdit={changeModalEdit} setData={setData} deleteData={deleteData} alldata={data}/>
       </Modal>
 
 

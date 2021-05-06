@@ -1,12 +1,10 @@
-import React, {useState , useEffect } from 'react';
+import React from 'react';
 import {makeStyles} from '@material-ui/core/styles';
 import { Grid } from '@material-ui/core'
 import Paper from '@material-ui/core/Paper';
-import VendorService from "../services/vendor.service.js";
-import { Autocomplete } from '@material-ui/lab';
-import{TextField} from '@material-ui/core';
-import MaterialTable from 'material-table'
 import { DataGrid } from '@material-ui/data-grid';
+import IconButton from '@material-ui/core/IconButton';
+import CloseIcon from '@material-ui/icons/Close';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -71,7 +69,7 @@ const DescriptionComponent = ({data}) => {
       <div style={{ height: '220px', width: '100%' }}>
       <DataGrid 
       getRowId={(row) => row.priceReductionId}
-       rows={data.priceReductions} 
+       rows={data.priceReductions ? data.priceReductions : [] } 
        columns={columns} 
        pageSize={2} />
       </div>
