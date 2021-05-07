@@ -18,8 +18,7 @@ const Login = () => {
         function login(){
             AuthService.login(newItemData.name, newItemData.pass).then(() => {
                 history.push('/table');
-            }).catch((wtf)=>{
-                console.log(wtf);
+            }).catch(()=>{
                 setnewItemData(prevState=>({
                     ...prevState,
                     error: true

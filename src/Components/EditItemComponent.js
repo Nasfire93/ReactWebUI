@@ -9,6 +9,7 @@ import VendorService from "../services/vendor.service.js";
 import ItemsService from "../services/items.service.js";
 import IconButton from '@material-ui/core/IconButton';
 import CloseIcon from '@material-ui/icons/Close';
+import PriceReductionService from "../services/priceReduction.service.js";
 
 
 
@@ -42,16 +43,12 @@ const useStyles = makeStyles((theme) => ({
   const EditItemComponent = (props) => {
     const itemsService = ItemsService;
     const vendorService = VendorService;
-    const [options, setOptions] = useState([]);
+    const priceReductionService = PriceReductionService;
+    const [optionsVendor, setOptionsVendor] = useState([]);
+    const [optionsPriceReduction, setOptionsPriceReduction] = useState([]);
     const data = props.data;
+    console.log(data);
     const classes = useStyles();
-    const columns = [
-      { title: "ID", field: "priceReductionId" ,flex: 1},
-      { title: "Creator", field: "creator", flex: 1},
-      { title: "Reduced Price" ,field: "reducedprice" , flex: 1},
-      { title: "Date Start", field: "datestart"  ,flex: 1},
-      { title: "Date End", field: "dateend", flex: 1}
-    ];
 
     const [newItemData,setnewItemData] = useState({
         "itemsId" : data.itemsId,
@@ -61,7 +58,7 @@ const useStyles = makeStyles((theme) => ({
         "price":data.price, 
         "creator": data.creator,
         "vendor":data.vendor,
-        "priceReductions":data.priceReductions ? data.priceReductions : []
+        "priceReductions": data.priceReductions ? data.priceReductions : []
         })
 
         const handleChange=e=>{
@@ -86,20 +83,30 @@ const useStyles = makeStyles((theme) => ({
               }));
               };
 
+              const handleChangePriceReduction=(event, value)=>{
+                setnewItemData(prevState=>({
+                  ...prevState,
+                  "priceReductions": value
+                }));
+                };
+
               const getVendors = async() =>{
                 await vendorService.findAll().then(response => {
-                  setOptions(response.data);
+                  setOptionsVendor(response.data);
+                  })
+              }
+
+              const getPriceReduction= async() =>{
+                await priceReductionService.findAll().then(response => {
+                  setOptionsPriceReduction(response.data);
                   })
               }
 
               const postData = async() =>{
-                
-                await props.setData(props.alldata.filter(i => i.itemsId !== newItemData.itemsId));
-                let toadd = await itemsService.addItem(newItemData);
-                await props.setData(props.alldata.concat(toadd));
+                await props.setData(
+                    props.alldata.filter(i => i.itemsId !== newItemData.itemsId)
+                    .concat(newItemData));
                 props.changeModalEdit();
-                
-                
               }
     return (
       <div className={classes.modal}>
@@ -156,28 +163,32 @@ const useStyles = makeStyles((theme) => ({
                 <TextField defaultValue={data.creator}  label="Creator" name="creator" onChange={handleChange}></TextField>
             </FormControl>
             </Grid>
-            <Grid item xs={12} sm={6} md={4} >
+            <Grid item xs={12} sm={6} md={6} >
             <Autocomplete
+                multiple
                 onOpen ={getVendors}
                 onChange={handleChangeVendor}
                 defaultValue={data.vendor}
-                options={options}
+                options={optionsVendor}
                 getOptionLabel={(option) => (option ? option.name : "")}
                 renderInput={(params) =>
                     <TextField {...params} label="Vendor" name="vendor" variant="outlined" />
                 }
             />
             </Grid>
-        
-        <div style={{ height: '220px', width: '100%' }}>
-            { 
-            <DataGrid 
-                getRowId={(row) => row.priceReductionId}
-                rows={data.priceReductions ? data.priceReductions : []} 
-                columns={columns} 
-                pageSize={2} />
-            }
-        </div>
+            <Grid item xs={12} sm={6} md={6} >
+            <Autocomplete
+                multiple
+                onOpen ={getPriceReduction}
+                onChange={handleChangePriceReduction}
+                defaultValue={data.priceReductions}
+                options={optionsPriceReduction}
+                getOptionLabel={(option) => (option ? option.name : "")}
+                renderInput={(params) =>
+                    <TextField {...params} label="Price Reduction" name="priceReduction" variant="outlined" />
+                }
+            />
+            </Grid>
         </Grid>
         <br />
         <div align="right">

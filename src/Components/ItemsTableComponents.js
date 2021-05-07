@@ -6,6 +6,7 @@ import moment from 'moment';
 import ItemsService from "../services/items.service.js";
 import AuthService from "../services/auth.service.js";
 import VendorService from "../services/vendor.service.js";
+import PriceReductionService from "../services/priceReduction.service.js";
 import { Grid } from '@material-ui/core'
 import { Autocomplete } from '@material-ui/lab';
 import { useHistory} from "react-router-dom";
@@ -13,6 +14,7 @@ import DescriptionComponent from "../Components/DescriptionComponent.js";
 import EditItemComponent from "../Components/EditItemComponent.js";
 import IconButton from '@material-ui/core/IconButton';
 import CloseIcon from '@material-ui/icons/Close';
+
 
 const columns = [
   { title: "Item", field: "itemsId" },
@@ -52,6 +54,7 @@ const ItemsTable = () => {
   const itemsService = ItemsService;
   const vendorService = VendorService;
   const authService = AuthService;
+  const priceReductionService = PriceReductionService;
 
   const [data,setData] = useState([]);
   const [dataedit,setDataEdit] = useState([]);
@@ -63,9 +66,12 @@ const ItemsTable = () => {
   "state":"Active",
   "price":"", 
   "creator": authService.getCurrentUser().username,
-  "vendor":""
+  "vendor":"",
+  "priceReductions":""
   })
-  const [options, setOptions] = useState([]);
+  const [optionsVendor, setOptionsVendor] = useState([]);
+  const [optionsPriceReduction, setOptionsPriceReduction] = useState([]);
+  
 
   const handleChange=e=>{
     const {name, value}=e.target;
@@ -81,6 +87,13 @@ const ItemsTable = () => {
       "vendor": value
     }));
     };
+
+    const handleChangePriceReduction=(event, value)=>{
+      setnewItemData(prevState=>({
+        ...prevState,
+        "priceReductions": value
+      }));
+      };
 
     const handleChangeState=(event, value)=>{
       setnewItemData(prevState=>({
@@ -110,9 +123,16 @@ const ItemsTable = () => {
 
   const getVendors = async() =>{
       await vendorService.findAll().then(response => {
-        setOptions(response.data);
+        setOptionsVendor(response.data);
         })
     }
+
+    const getPriceReduction= async() =>{
+      await priceReductionService.findAll().then(response => {
+        setOptionsPriceReduction(response.data);
+        })
+    }
+
     const logout = () =>{
       authService.logout();
       history.push('/');
@@ -157,12 +177,23 @@ const ItemsTable = () => {
       <br />
       <br />
       <Autocomplete
+        multiple
         onOpen ={getVendors}
         onChange={handleChangeVendor}
-        options={options}
+        options={optionsVendor}
         getOptionLabel={(option) => (option ? option.name : "")}
         renderInput={(params) =>
           <TextField {...params} label="Vendor" name="vendor" variant="outlined" />}
+      />
+      <br />
+      <Autocomplete
+        multiple
+        onOpen ={getPriceReduction}
+        onChange={handleChangePriceReduction}
+        options={optionsPriceReduction}
+        getOptionLabel={(option) => (option ? option.reducedprice.toString() : "")}
+        renderInput={(params) =>
+          <TextField {...params} label="Price Reduction" name="priceReductions" variant="outlined" />}
       />
       <br />
       <div align="right">

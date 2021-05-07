@@ -23,12 +23,17 @@ const useStyles = makeStyles((theme) => ({
 
 const DescriptionComponent = ({data}) => {
   const classes = useStyles();
-  const columns = [
+  const columnsReducedPrice = [
     { title: "ID", field: "priceReductionId" ,flex: 3},
     { title: "Creator", field: "creator", flex: 1},
     { title: "Reduced Price" ,field: "reducedprice" , flex: 1},
     { title: "Date Start", field: "datestart"  ,flex: 1},
     { title: "Date End", field: "dateend", flex: 1}
+  ];
+  const columnsVendors = [
+    { title: "ID", field: "vendorId" ,flex: 3},
+    { title: "Vendor", field: "name" ,flex: 3},
+    { title: "Country Vendor", field: "country", flex: 1},
   ];
 
   const bodyInsert = (
@@ -43,34 +48,39 @@ const DescriptionComponent = ({data}) => {
           <Paper className={classes.paper}>ID</Paper>
           <Paper className={classes.paper}>State</Paper>
           <Paper className={classes.paper}>Creation Date</Paper>
-          <Paper className={classes.paper}>Vendor</Paper>
         </Grid>
         <Grid item xs={6} sm={3}>
           <Paper className={classes.paper}>{data.itemsId}</Paper>
           <Paper className={classes.paper}>{data.state}</Paper>
           <Paper className={classes.paper}>{data.creationDate}</Paper>
-          <Paper className={classes.paper}>{data.vendor.name}</Paper>
 
         </Grid>
         <Grid item xs={6} sm={3} >
           <Paper className={classes.paper}>Description</Paper>
           <Paper className={classes.paper}>Price</Paper>
           <Paper className={classes.paper}>Creator</Paper>
-          <Paper className={classes.paper}>CountryVendor</Paper>
         </Grid>
         <Grid item xs={6} sm={3}>
           <Paper className={classes.paper}>{data.description}</Paper>
           <Paper className={classes.paper}>{data.price}</Paper>
           <Paper className={classes.paper}>{data.creator}</Paper>
-          <Paper className={classes.paper}>{data.vendor.country}</Paper>
         </Grid>
         <Grid item xs={12} sm={12} ><Paper className={classes.paper}>Reduced Price List</Paper></Grid>
       </Grid>
+
+      <div style={{ height: '220px', width: '100%' }}>
+      <DataGrid 
+      getRowId={(row) => row.vendorId}
+       rows={data.vendor ? data.vendor : [] } 
+       columns={columnsVendors} 
+       pageSize={2} />
+      </div>
+
       <div style={{ height: '220px', width: '100%' }}>
       <DataGrid 
       getRowId={(row) => row.priceReductionId}
        rows={data.priceReductions ? data.priceReductions : [] } 
-       columns={columns} 
+       columns={columnsReducedPrice} 
        pageSize={2} />
       </div>
     </div>
